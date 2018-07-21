@@ -1,0 +1,131 @@
+﻿
+@{
+    ViewBag.Title = "数据管理";
+}
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css" />
+<link href="https://cdn.jsdelivr.net/npm/gijgo@1.9.6/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<link href="~/Content/grid/grid.min.css" rel="stylesheet" />
+<script>
+    $(document).ready(function () {
+        var ll = new Array();
+        var searchURL = '/Home/Search';
+        $("#submit").click(function () {
+            $.ajax({
+                type: "GET",
+                url: searchURL,
+                data: { 'Tail': 'search', 'From': $("#from").val(), 'To': $("#to").val() },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+                $("#table").empty();
+                $.each(data, function (index, item) {
+                    $trTemp = $("<tr></tr>");
+                    //往行里面追加 td单元格
+                    var l = new Array();
+                    l[0] = item._Num;
+                    l[1] = item._MudPressure;
+                    l[2] = item._FlowRate;
+                    l[3] = item._Temp;
+                    l[4] = item._Time;
+                    l[5] = index;
+                    ll.push(l);
+                    $trTemp.append("<th>" + item._Num + "</th>");
+                    $trTemp.append("<td>" + item._MudPressure + "</div></td>");
+                    $trTemp.append("<td>" + item._Temp + "</div></td>");
+                    $trTemp.append("<td>" + item._FlowRate + "</div></td>");
+                    $trTemp.append("<td>" + item._Time + "</div></td>");
+                    $trTemp.append("<td>" + index + "</div></td>");
+                    $trTemp.append("<td><button onclick='Edit("+index+")'>编辑</button></td>");
+
+
+                    // $("#J_TbData").append($trTemp);
+                    $trTemp.appendTo("#table");
+
+                    $(document).find('.btn_save').hide();
+                    $(document).find('.btn_cancel').hide();
+                    //$("#name").append(item.Name);
+                    //$("#text").append(item.Text);
+                    //$("#time").append(item.Time);
+                });
+            };
+
+            function errorFunc() {
+                alert(Error.toString());
+            }
+        });
+    })
+
+
+    function Edit(index) {
+        $.ajax({
+            type: "GET",
+            url: '/Home/Edit',
+            data: { 'Tail': 'send', 'info': index },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: successFunc,
+            error: errorFunc
+        });
+
+        function successFunc(data, status) {
+            alert(data);
+        }
+
+
+        function errorFunc() {
+            alert(Error.toString());
+        }
+    }
+
+
+</script>
+
+<!-- Button to Open the Modal -->
+<!-- The Modal -->
+<button class="btn btn-default" id="save" type="button">保存</button>
+<button class="btn btn-primary" id="stop" type="submit">停止</button>
+<div class="container">
+    <div class="input-group border-primary">
+        <span class="input-group-text" id="basic-addon1">From</span>
+        <input id="from" type="datetime-local" value="" />
+        <span class="input-group-text" id="basic-addon1">To</span>
+        <input id="to" type="datetime-local" />
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="submit">Button</button>
+        </div>
+    </div>
+</div>
+
+
+
+<table class="table table-striped" id="grid" table-layout: fixed; width: 100%; white-space: nowrap;>
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">土压</th>
+            <th scope="col">温度</th>
+            <th scope="col">流量</th>
+            <th scope="col">时间</th>
+            <th scope="col">序号</th>
+        </tr>
+    </thead>
+    <tbody id="table">
+
+        <tr>
+            <th scope="col">234</th>
+            <td scope="col">土压</td>
+            <td scope="col">温度</td>
+            <td scope="col">流量</td>
+            <td scope="col">时间</td>
+            <td scope="col">序号</td>
+            <td scope="col">操作</td>
+        </tr>
+
+    </tbody>
+</table>
+

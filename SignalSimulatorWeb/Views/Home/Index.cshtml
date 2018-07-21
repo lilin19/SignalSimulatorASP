@@ -1,0 +1,110 @@
+﻿@{
+    ViewBag.Title = "TestMain";
+}
+
+<head runat="server">
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        var serviceURL = '/AjaxTest/FirstAjax';
+        var requestURL = '/AjaxTest/writerequest';
+        setInterval("getinfo()", 1000);
+        function getinfo() {
+
+            $.ajax({
+                type: "POST",
+                url: serviceURL,
+                data: { 'tail': 'ask' },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+                $("#num").html(data);
+
+                //$("#time").html(data.time);
+                //alert(data);
+            }
+
+            function errorFunc() {
+                alert(status);
+            }
+        };
+
+
+        $(document).ready(function () {
+            $("#input").click(
+                function () {
+                    $("#table").empty();
+
+                    $.ajax({
+                        type: "GET",
+                        url: requestURL,
+                        data: { 'Tail': "send", 'Name': "Dunodulke", 'Text': $("#test").val() },
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: successFunc,
+                        error: errorFunc
+                    });
+
+                    function successFunc(data, status) {
+                        $.each(data, function (index, item) {
+                            $trTemp = $("<ul class='list - group'></ul>");
+                            //往行里面追加 td单元格
+
+                            $trTemp.append("<li class='list - group - item'>" + item.Name + "          " + item.Time + "</li>");
+                            $trTemp.append("<li class='list - group - item'>" + item.Text + "</li>");
+                            // $("#J_TbData").append($trTemp);
+                            $trTemp.appendTo("#table");
+
+                            //$("#name").append(item.Name);
+                            //$("#text").append(item.Text);
+                            //$("#time").append(item.Time);
+                        });
+                    };
+
+                    function errorFunc() {
+                        alert(Error.toString());
+                    }
+                });
+        });
+    </script>
+</head>
+
+<style type="text/css">
+    #l {
+        color: white;
+        font-family: Geogia bold;
+        background: black;
+    }
+</style>
+
+
+<body>
+    <div class="panel-body">
+        <div class="well well-lg" id="out" style="height:400px; overflow:auto">
+            <br><h4>
+                <span id="num" class='label label-primary'>
+                </span>
+            </h4>
+            <br>
+            <h4>
+                <span id="name" class='label label-primary'></span>
+                <span id="text" class='label label-primary'></span>
+                <span id="time" class='label label-primary'></span>
+            </h4>
+            <div id="table"></div>
+        </div>
+    </div>
+
+    <!-- /.col-lg-6 -->
+    <div class="col-lg-6">
+        <div class="input-group">
+            <input type="text" class="form-control" id="test" value="" placeholder="enter">
+            <button class="btn btn-default" id="input" type="button">Go!</button>
+        </div><!-- /input-group -->
+    </div><!-- /.col-lg-6 -->
+
+</body>
