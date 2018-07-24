@@ -1,0 +1,409 @@
+﻿
+@{
+    ViewBag.Title = "曲线";
+}
+
+<script src="~/Scripts/echarts.js"></script>
+
+<body>
+    <script>
+        var a = new Array();
+        var b = new Array();
+        var c = new Array();
+        var d = new Array();
+        var e = new Array();
+        var f = new Array();
+        var g = new Array();
+        var h = new Array();
+        var i = new Array();
+        var t = new Array();
+        var width = 20;
+        function rendermax(a, b, c, t) {
+            var myChart = echarts.init(document.getElementById('max'));
+
+            var labelOption = {
+                normal: {
+                    show: true,
+                    position: 'insideBottom',
+                    distance: 15,
+                    align: 'left',
+                    verticalAlign: 'middle',
+                    rotate: 90,
+                    formatter: '{c}  {name|{a}}',
+                    fontSize: 16,
+                    rich: {
+                        name: {
+                            textBorderColor: '#fff'
+                        }
+                    }
+                }
+            };
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                toolbox: {
+                    show: true,
+                    orient: 'vertical',
+                    left: 'right',
+                    top: 'center',
+                    feature: {
+                        mark: { show: true },
+                        dataView: { show: true, readOnly: false },
+                        magicType: { show: true, type: ['line', 'bar', 'stack', 'tiled'] },
+                        restore: { show: true },
+                        saveAsImage: { show: true }
+                    }
+                },
+                calculable: true,
+                title: {
+                    text: '测数最大值统计'
+                },
+                legend: {
+                    data: ['土压', '流量', '温度']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    axisTick: {
+                        alignWithLabel: true
+                    },
+                    axisLine: {
+                        onZero: false,
+                    },
+                    axisPointer: {
+                        label: {
+                            formatter: function (params) {
+                                return '降水量  ' + params.value
+                                    + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+                            }
+                        }
+                    },
+                    data: t
+                
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '土压',
+                        barWidth: width,//固定柱子宽度
+                        type: 'bar',
+                        barGap: 0,
+                        label: labelOption,
+                        data: a
+                    },
+                    {
+                        name: '流量',
+                        type: 'bar',
+                        barWidth: width,//固定柱子宽度
+                        barGap: 0,
+                        label: labelOption,
+                        data: b
+                    },
+                    {
+                        name: '温度',
+                        type: 'bar',
+                        barWidth: width,//固定柱子宽度
+                        barGap: 0,
+                        label: labelOption,
+                        data: c
+                    }
+                ]
+
+            };
+            myChart.setOption(option);
+        }
+
+
+        function rendermin(d, e, f, t) {
+            var myChart = echarts.init(document.getElementById('min'));
+            var labelOption = {
+                normal: {
+                    show: true,
+                    position: 'insideBottom',
+                    distance: 15,
+                    align: 'left',
+                    verticalAlign: 'middle',
+                    rotate: 90,
+                    formatter: '{c}  {name|{a}}',
+                    fontSize: 16,
+                    rich: {
+                        name: {
+                            textBorderColor: '#fff'
+                        }
+                    }
+                }
+            };
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                toolbox: {
+                    show: true,
+                    orient: 'vertical',
+                    left: 'right',
+                    top: 'center',
+                    feature: {
+                        mark: { show: true },
+                        dataView: { show: true, readOnly: false },
+                        magicType: { show: true, type: ['line', 'bar', 'stack', 'tiled'] },
+                        restore: { show: true },
+                        saveAsImage: { show: true }
+                    }
+                },
+                calculable: true,
+                title: {
+                    text: '测数最大值统计'
+                },
+                legend: {
+                    data: ['土压', '流量', '温度']
+                },
+                xAxis: {
+                    type: 'category',
+                    axisTick: {
+                        alignWithLabel: true
+                    },
+                    axisLine: {
+                        onZero: false,
+                    },
+                    axisPointer: {
+                        label: {
+                            formatter: function (params) {
+                                return '降水量  ' + params.value
+                                    + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+                            }
+                        }
+                    },
+                    data: t
+
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '土压',
+                        type: 'bar',
+                        barGap: 0,
+                        barWidth: width,//固定柱子宽度
+                        label: labelOption,
+                        data: d
+                    },
+                    {
+                        name: '流量',
+                        type: 'bar',
+                        barGap: 0,
+                        barWidth: width,//固定柱子宽度
+                        label: labelOption,
+                        data: e
+                    },
+                    {
+                        name: '温度',
+                        type: 'bar',
+                        barGap: 0,
+                        barWidth: width,//固定柱子宽度
+                        label: labelOption,
+                        data: f
+                    }
+                ]
+
+            };
+            myChart.setOption(option);
+            debugger;
+        }
+
+
+        function renderavg(g, h, i, t) {
+            var myChart = echarts.init(document.getElementById('avg'));
+            var labelOption = {
+                normal: {
+                    show: true,
+                    position: 'insideBottom',
+                    distance: 15,
+                    align: 'left',
+                    verticalAlign: 'middle',
+                    rotate: 90,
+                    formatter: '{c}  {name|{a}}',
+                    fontSize: 16,
+                    rich: {
+                        name: {
+                            textBorderColor: '#fff'
+                        }
+                    }
+                }
+            };
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                toolbox: {
+                    show: true,
+                    orient: 'vertical',
+                    left: 'right',
+                    top: 'center',
+                    feature: {
+                        mark: { show: true },
+                        dataView: { show: true, readOnly: false },
+                        magicType: { show: true, type: ['line', 'bar', 'stack', 'tiled'] },
+                        restore: { show: true },
+                        saveAsImage: { show: true }
+                    }
+                },
+                calculable: true,
+                title: {
+                    text: '测数最大值统计'
+                },
+                legend: {
+                    data: ['土压', '流量', '温度']
+                },
+                xAxis: {
+                    type: 'category',
+                    axisTick: {
+                        alignWithLabel: true
+                    },
+                    axisLine: {
+                        onZero: false,
+                    },
+                    axisPointer: {
+                        label: {
+                            formatter: function (params) {
+                                return '降水量  ' + params.value
+                                    + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+                            }
+                        }
+                    },
+                    data: t
+
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '土压',
+                        type: 'bar',
+                        barGap: 0,
+                        barWidth: width,//固定柱子宽度
+                        label: labelOption,
+                        data: g
+                    },
+                    {
+                        name: '流量',
+                        type: 'bar',
+                        barGap: 0,
+                        barWidth: width,//固定柱子宽度
+                        label: labelOption,
+                        data: h
+                    },
+                    {
+                        name: '温度',
+                        type: 'bar',
+                        barGap: 0,
+                        barWidth: width,//固定柱子宽度
+                        label: labelOption,
+                        data: i
+                    }
+                ]
+
+            };
+            myChart.setOption(option);
+        }
+        function chartsearch() {
+            $.ajax({
+                type: "GET",
+                url: '/Home/SearchStats',
+                data: { 'Tail': 'search', 'From': $("#from").val(), 'To': $("#to").val() },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+
+                $.each(data.maxPressure, function (index, element) {
+                    a.push(element);
+                });
+                $.each(data.maxFlow, function (index, element) {
+                    b.push(element);
+                });
+                $.each(data.maxTemp, function (index, element) {
+                    c.push(element);
+                });
+                $.each(data.avgPressure, function (index, element) {
+                    d.push(element);
+                });
+                $.each(data.avgFlow, function (index, element) {
+                    e.push(element);
+                });
+                $.each(data.avgTemp, function (index, element) {
+                    f.push(element);
+                });
+                $.each(data.minPressure, function (index, element) {
+                    g.push(element);
+                });
+                $.each(data.minFlow, function (index, element) {
+                    h.push(element);
+                });
+                $.each(data.minTemp, function (index, element) {
+                    i.push(element);
+                });
+                $.each(data.minute, function (index, element) {
+                    t.push(element);
+                });
+                rendermax(a, b, c, t);
+                rendermin(d, e, f, t);
+                renderavg(g, h, i, t);
+                 a = new Array();
+                 b = new Array();
+                 c = new Array();
+                 d = new Array();
+                 e = new Array();
+                 f = new Array();
+                 g = new Array();
+                 h = new Array();
+                 i = new Array();
+                 t = new Array();
+
+
+            }
+
+            function errorFunc() {
+                alert(Error.toString());
+            }
+        };
+
+
+    </script>
+
+    <div class="container">
+        <div class="input-group border-primary">
+            <span class="input-group-text" id="basic-addon1">From</span>
+            <input id="from" type="datetime-local" value="" />
+            <span class="input-group-text" id="basic-addon1">To</span>
+            <input id="to" type="datetime-local" />
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="chartsearch()" id="submit">搜索</button>
+            </div>
+        </div>
+    </div>
+    <div id="max" style="width: 100%; height: 400px;"></div>
+    <div id="min" style="width: 100%; height: 400px;"></div>
+    <div id="avg" style="width: 100%; height: 400px;"></div>
+</body>

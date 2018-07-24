@@ -1,0 +1,119 @@
+﻿
+@{
+    ViewBag.Title = "数据模拟器";
+}
+<head runat="server">
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        var requestURL = '/Home/RequestData';
+        var startURL = '/Home/Start';
+        var haltURL = '/Home/Stop';
+
+        setInterval("getinfo()", 3000);
+        function getinfo() {
+
+            $.ajax({
+                type: "GET",
+                url: requestURL,
+                data: { 'tail': 'ask' },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+                $("#table").empty();
+                $.each(data, function (index, item) {
+                    $trTemp = $("<tr></tr>");
+                    //往行里面追加 td单元格
+
+                    $trTemp.append("<th>" + item._Num + "</th>");
+                    $trTemp.append("<td>" + item._MudPressure + "</td>");
+                    $trTemp.append("<td>" + item._Temp + "</td>");
+                    $trTemp.append("<td>" + item._FlowRate + "</td>");
+                    $trTemp.append("<td>" + item._Time + "</td>");
+
+                    // $("#J_TbData").append($trTemp);
+                    $trTemp.appendTo("#table");
+
+                    //$("#name").append(item.Name);
+                    //$("#text").append(item.Text);
+                    //$("#time").append(item.Time);
+                });
+                //alert(data);
+            }
+
+            function errorFunc() {
+                alert(Error);
+            }
+        };
+
+        $(document).ready(function () {
+            $("#start").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: startURL,
+                    data: { 'Tail': 'send' },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: successFunc,
+                    error: errorFunc
+                });
+
+                function successFunc(data, status) {
+                    alert(data);
+                }
+
+
+                function errorFunc() {
+                    alert(Error.toString());
+                }
+            });
+        })
+
+        $(document).ready(function () {
+            $("#stop").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: haltURL,
+                    data: { 'Tail': 'halt' },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: successFunc,
+                    error: errorFunc
+                });
+
+                function successFunc(data, status) {
+                    alert(data);
+                }
+
+                function errorFunc() {
+                    alert(Error.toString());
+                }
+            });
+        })
+    </script>
+</head>
+
+<div class="container">
+    <!-- Content here -->
+
+    <button class="btn btn-default" id="start" type="button">开始!</button>
+    <button class="btn btn-primary" id="stop" type="submit">停止</button>
+    <div class="container-fluid" height="1000" width="700">
+        <table class="table table-striped" table-layout: fixed; width: 100%; white-space: nowrap;>
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">土压</th>
+                    <th scope="col">温度</th>
+                    <th scope="col">流量</th>
+                    <th scope="col">时间</th>
+                </tr>
+            </thead>
+            <tbody id="table"></tbody>
+        </table>
+    </div>
+</div>

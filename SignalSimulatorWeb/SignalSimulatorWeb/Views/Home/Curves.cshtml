@@ -1,0 +1,124 @@
+﻿
+@{
+    ViewBag.Title = "曲线";
+}
+<script src="~/Scripts/echarts.js"></script>
+
+<body>
+    <script>
+        
+        var a = new Array();
+        var b = new Array();
+        var c = new Array();
+        var t = new Array();
+        
+        function render(a, b, c, t) {
+            var myChart = echarts.init(document.getElementById('main'));
+            var option = {
+                title: {
+                    text: '测数曲线'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['土压', '温度', '流量']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    onZero: false,
+                    data: t
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '土压',
+                        type: 'line',
+       
+                        data: a
+                    },
+                    {
+                        name: '温度',
+                        type: 'line',
+                
+                        data: b
+                    },
+                    {
+                        name: '流量',
+                        type: 'line',
+                
+                        data: c
+                    }
+                ]
+                
+            };
+            myChart.setOption(option);
+            debugger;
+        }
+        function chartsearch() {
+            $.ajax({
+                type: "GET",
+                url: '/Home/SearchChart',
+                data: { 'Tail': 'search', 'From': $("#from").val(), 'To': $("#to").val() },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+                 a = new Array();
+                 b = new Array();
+                 c = new Array();
+                 t = new Array();
+                $.each(data.press, function (index, element) {
+                    a.push(element);
+                });
+                $.each(data.temp, function (index, element) {
+                    b.push(element);
+                });
+                $.each(data.flow, function (index, element) {
+                    c.push(element);
+                });
+                $.each(data.time, function (index, element) {
+                    t.push(element);
+                });
+                render(a,b,c,t);
+
+            }
+
+            function errorFunc() {
+                alert(Error.toString());
+            }
+        };
+
+
+    </script>
+
+    <div class="container">
+        <div class="input-group border-primary">
+            <span class="input-group-text" id="basic-addon1">From</span>
+            <input id="from" type="datetime-local" value="" />
+            <span class="input-group-text" id="basic-addon1">To</span>
+            <input id="to" type="datetime-local" />
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="chartsearch()" id="submit">搜索</button>
+            </div>
+        </div>
+    </div>
+    <div id="main" style="width: 100%; height: 300px;"></div>
+</body>

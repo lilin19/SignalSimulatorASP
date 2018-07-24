@@ -1,0 +1,291 @@
+﻿
+@{
+    ViewBag.Title = "数据管理";
+}
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css" />
+<link href="https://cdn.jsdelivr.net/npm/gijgo@1.9.6/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<link href="~/Content/grid/grid.min.css" rel="stylesheet" />
+<script>
+    var ll = new Array();
+
+     function DateConvert (value) {
+         var milli = "/Date(1245398693390)/".replace(/\/Date\((-?\d+)\)\//, '$1');
+         var d = new Date(parseInt(milli));
+         return d;
+     }
+
+    function DateFormater(value) {
+    var date = new Date();
+    var day = date.getDate();       // yields date
+    var month = date.getMonth() + 1;    // yields month (add one as '.getMonth()' is zero indexed)
+    var year = date.getFullYear();  // yields year
+    var hour = date.getHours();     // yields hours 
+    var minute = date.getMinutes(); // yields minutes
+    var second = date.getSeconds(); // yields seconds
+
+    // After this construct a string with the above results as below
+        var time = day + "/" + month + "/" + year + " " + hour + ':' + minute + ':' + second; 
+        return time;
+    }
+    $(document).ready(function () {
+       
+        var searchURL = '/Home/Search';
+        $("#submit").click(function () {
+            ll = new Array();
+            $.ajax({
+                type: "GET",
+                url: searchURL,
+                data: { 'Tail': 'search', 'From': $("#from").val(), 'To': $("#to").val() },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+                $("#table").empty();
+                $.each(data, function (index, item) {
+                    $trTemp = $("<tr></tr>");
+                    //往行里面追加 td单元格
+                    var l = new Array();
+                    l[0] = item._Num;
+                    l[1] = item._MudPressure;
+                    l[2] = item._FlowRate;
+                    l[3] = item._Temp;
+                    l[4] = item._Time;
+                    l[5] = item._Key;
+                    ll.push(l);
+                    $trTemp.append("<th>" + item._Num + "</th>");
+                    $trTemp.append("<td>" + item._MudPressure + "</td>");
+                    $trTemp.append("<td>" + item._Temp + "</td>");
+                    $trTemp.append("<td>" + item._FlowRate + "</td>");
+                    $trTemp.append("<td>" + DateConvert(item._Time).toString() + "</td>");
+                    $trTemp.append("<td><button type='button' data-toggle='modal' data-target='#myModal' onclick='Edit(" + index + ")'>编辑</button><button type='button' onclick='Delete(" + index + ")'>删除</button></td>");
+
+
+                    // $("#J_TbData").append($trTemp);
+                    $trTemp.appendTo("#table");
+
+                    $(document).find('.btn_save').hide();
+                    $(document).find('.btn_cancel').hide();
+                    //$("#name").append(item.Name);
+                    //$("#text").append(item.Text);
+                    //$("#time").append(item.Time);
+                });
+            };
+
+            function errorFunc() {
+                alert(Error.toString());
+            }
+        });
+    })
+
+    function validate() {
+        var pat = /^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/;
+        var reg = /^[1-9]\d*$/;
+        var a = document.getElementById("press").value;
+        var b = document.getElementById("temp").value;
+        var c = document.getElementById("flow").value;
+
+
+        if (a == "") { alert("请输入土压"); return false }
+        if (b == "") { alert("请输入温度"); return false }
+        if (c == "") { alert("请输入流量"); return false }
+
+        if (!pat.exec(a)) { alert("土压必须是小数或整数"); return false }
+        if (!reg.exec(b)) { alert("温度必须是整数"); return false }
+        if (!pat.exec(c)) { alert("流量必须是小数或整数"); return false }
+        
+        var A = parseFloat(a);
+        var B = parseInt(b);
+        var C = parseFloat(c);
+        if (A > 55 || A < 45) { alert("土压范围在45到55之间"); return false }
+        if (B < 50 || B > 150) { alert("温度范围在50到150之间"); return false }
+        if (C < 50 || C > 150) { alert("流量范围在50到150之间"); return false }
+        return true;
+    }
+
+    function Edit(index) {
+       // alert($("tr")[index + 1].children[1].innerHTML);
+        //alert(ll[0]);
+
+        $("#num").val(ll[index][0]);
+        $("#press").val(ll[index][1]);
+        $("#temp").val(ll[index][3]);
+        $("#flow").val(ll[index][2]);
+        $("#time").val(DateConvert(ll[index][4])).toString();
+        $("#rownum").val(index);
+        // alert(tableRow);
+    }
+    function Delete(index) {
+        // alert($("tr")[index + 1].children[1].innerHTML);
+        var r = confirm("删除此数据？");
+        if (r == true) {
+            alert(index);
+            DeleteSend(index);
+        }
+        else {
+            return;
+        }
+
+        
+        // alert(tableRow);
+    }
+
+    function Save(index) {
+        // alert($("tr")[index + 1].children[1].innerHTML);
+
+        if (validate()) {
+
+            var row = $("#rownum").val();
+            ll[row][1] = $("#press").val();
+            ll[row][3] = $("#temp").val();
+            ll[row][2] = $("#flow").val();
+
+
+            SaveSend(row);
+        }
+        //$("#num").val(ll[index][0]);
+        //$("#press").val(ll[index][1]);
+        //$("#temp").val(ll[index][2]);
+        //$("#flow").val(ll[index][3]);
+        //$("#time").val(ll[index][4]);
+
+      
+    }
+
+    function SaveSend(row) {
+        $.ajax({
+            type: "GET",
+            url: "/Home/Save",
+            data: { 'Tail': 'save', 'Num': ll[row][0], 'Pressure': ll[row][1], 'Temp': ll[row][3], 'Flow': ll[row][2], 'Time': DateFormater(DateConvert(ll[row][4])), 'index': ll[row][5] },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: successFunc,
+            error: errorFunc
+        });
+        function successFunc(data, status) {
+            alert(data);
+        }
+
+        function errorFunc(error) {
+            alert(Error);
+        }
+    }
+
+
+    function DeleteSend(row) {
+        $.ajax({
+            type: "GET",
+            url: "/Home/Delete",
+            data: { 'Tail': 'delete', 'index': ll[row][5] },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: successFunc,
+            error: errorFunc
+        });
+        function successFunc(data, status) {
+            alert(data);
+        }
+
+        function errorFunc(error) {
+            alert(Error);
+        }
+    }
+
+</script>
+
+
+<div class="container">
+    <div class="input-group border-primary">
+        <span class="input-group-text" id="basic-addon1">From</span>
+        <input id="from" type="datetime-local" value="" />
+        <span class="input-group-text" id="basic-addon1">To</span>
+        <input id="to" type="datetime-local" />
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="submit">搜索</button>
+        </div>
+    </div>
+</div>
+
+
+
+<table class="table table-striped" id="grid" table-layout: fixed; width: 100%; white-space: nowrap;>
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">土压</th>
+            <th scope="col">温度</th>
+            <th scope="col">流量</th>
+            <th scope="col">时间</th>
+
+        </tr>
+    </thead>
+    <tbody id="table">
+
+<!--content -->
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div id="myModal" class="modal" role="dialog">
+    <info id="rownum"></info>
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">编辑数据</h4>
+            </div>
+            <div class="modal-body" num="">
+                <p>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="inputGroupSelect01">#</label>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Text input with segmented dropdown button" id="num" readonly ="readonly">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-append">
+                            <label class="input-group-text" for="inputGroupSelect02">土压</label>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Text input with segmented dropdown button" id="press">
+
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-append">
+                            <label class="input-group-text" for="inputGroupSelect02">温度</label>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Text input with segmented dropdown button" id="temp">
+
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-append">
+                            <label class="input-group-text" for="inputGroupSelect02">流量</label>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Text input with segmented dropdown button" id="flow">
+
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-append">
+                            <label class="input-group-text" for="inputGroupSelect02">时间</label>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Text input with segmented dropdown button" id="time" readonly>
+
+                    </div>
+
+</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" onclick="Save()">保存</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+
+    </div>
+</div>
